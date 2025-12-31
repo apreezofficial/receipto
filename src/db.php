@@ -33,19 +33,25 @@ function find_user_by_email($email) {
     return null;
 }
 
-function add_or_verify_user($email, $device, $ip) {
+function add_or_verify_user($email, $device, $ip, $strict = false) {
     // Backwards-compat helper: if a user exists for device and email matches, OK; otherwise error.
     $existing = find_user_by_device($device);
     if ($existing) {
         if (strtolower($existing['email']) !== strtolower($email)) {
-            return 'This device/IP already has a different email registered.';
+            if ($strict) {
+                return 'This device/IP already has a different email registered.';
+            }
+            // On service operations, allow different email from same device
         }
         return true;
     }
     // If email already exists, ensure it belongs to same device (legacy behavior)
     $emailOwner = find_user_by_email($email);
     if ($emailOwner && isset($emailOwner['device']) && $emailOwner['device'] !== $device) {
-        return 'This email is already registered from another device/IP.';
+        if ($strict) {
+            return 'This email is already registered from another device/IP.';
+        }
+        // On service operations, allow this check to pass
     }
     // Otherwise success (caller may create user record separately)
     return true;
@@ -66,6 +72,15 @@ function create_user($email, $password, $device, $ip) {
     ];
     $db['users'][] = $user;
     write_db($db);
+    return $user;
+}
+
+function verify_user_with_device_check($email, $device) {
+    $user = find_user_by_email($email);
+    if (!$user) return false;
+    if (isset($user['device']) && $user['device'] !== $device) {
+        return false; // Device mismatch on login
+    }
     return $user;
 }
 

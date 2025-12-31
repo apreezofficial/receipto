@@ -1,11 +1,12 @@
 {
     "users": [
         {
-            "id": "u_69553b6c26fac",
-            "email": "apreezofficial@gmail.com",
+            "id": "u_6955615d00331",
+            "email": "aa@aa.aa",
+            "password_hash": "$2y$10$b\/RPW2QjbIAnkhDr7JVKR.ebN1Lq0pNajQZ16BMyfDG8p0fYqNq6e",
             "device": "2c2927d43fef12778b49bb62fbcb002321461744",
             "ip": "::1",
-            "created_at": "2025-12-31T16:04:12+01:00"
+            "created_at": "2025-12-31T18:46:05+01:00"
         }
     ],
     "receipts": [
@@ -34,6 +35,72 @@
             "txid": "678",
             "memo": "678",
             "created_at": "2025-12-31T16:08:20+01:00"
+        },
+        {
+            "id": "r_6955618773f7f",
+            "service": "binance_deposit",
+            "service_name": "Binance Deposit",
+            "email": "aa@aa.aa",
+            "user_id": "u_6955615d00331",
+            "device": "2c2927d43fef12778b49bb62fbcb002321461744",
+            "ip": "::1",
+            "created_at": "2025-12-31T18:46:47+01:00",
+            "details": {
+                "amount": "88",
+                "currency": "BTC",
+                "network": "bitcoin",
+                "wallet": "Margin Wallet",
+                "address": "aasdfgh",
+                "txid": "asdrfghjk",
+                "date": "2025-12-31T09:46",
+                "confirmations": "1\/1"
+            },
+            "amount": "88",
+            "txid": "asdrfghjk"
+        },
+        {
+            "id": "r_695563407980f",
+            "service": "binance_deposit",
+            "service_name": "Binance Deposit",
+            "email": "aa@aa.aa",
+            "user_id": "u_6955615d00331",
+            "device": "2c2927d43fef12778b49bb62fbcb002321461744",
+            "ip": "::1",
+            "created_at": "2025-12-31T18:54:08+01:00",
+            "details": {
+                "amount": "122",
+                "currency": "BTC",
+                "network": "dfghj",
+                "wallet": "Spot Wallet",
+                "address": "dfghjk",
+                "txid": "ss",
+                "date": "2025-12-31T09:53",
+                "confirmations": "1\/1"
+            },
+            "amount": "122",
+            "txid": "ss"
+        },
+        {
+            "id": "r_69556e6197a33",
+            "service": "binance_deposit",
+            "service_name": "Binance Deposit",
+            "email": "aa@aa.aa",
+            "user_id": "u_6955615d00331",
+            "device": "2c2927d43fef12778b49bb62fbcb002321461744",
+            "ip": "::1",
+            "created_at": "2025-12-31T19:41:37+01:00",
+            "details": {
+                "amount": "4567",
+                "currency": "BTC",
+                "network": "bitcoin",
+                "wallet": "Spot Wallet",
+                "address": "ghjkl",
+                "txid": "ghjkl",
+                "date": "",
+                "confirmations": "1\/1"
+            },
+            "amount": "4567",
+            "txid": "ghjkl"
         }
     ]
 }
