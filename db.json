@@ -1,0 +1,39 @@
+{
+    "users": [
+        {
+            "id": "u_69553b6c26fac",
+            "email": "apreezofficial@gmail.com",
+            "device": "2c2927d43fef12778b49bb62fbcb002321461744",
+            "ip": "::1",
+            "created_at": "2025-12-31T16:04:12+01:00"
+        }
+    ],
+    "receipts": [
+        {
+            "id": "r_69553b6c285d3",
+            "email": "apreezofficial@gmail.com",
+            "device": "2c2927d43fef12778b49bb62fbcb002321461744",
+            "ip": "::1",
+            "from": "sfghj",
+            "to": "edrtghj",
+            "amount": 44,
+            "txid": "fghjkl",
+            "memo": "fghjk",
+            "created_at": "2025-12-31T16:04:12+01:00"
+        },
+        {
+            "id": "r_69553c640a9cf",
+            "service": "ltc",
+            "service_name": "Litecoin (LTC)",
+            "email": "apreezofficial@gmail.com",
+            "device": "2c2927d43fef12778b49bb62fbcb002321461744",
+            "ip": "::1",
+            "from": "dfgh",
+            "to": "rtyu",
+            "amount": 567,
+            "txid": "678",
+            "memo": "678",
+            "created_at": "2025-12-31T16:08:20+01:00"
+        }
+    ]
+}
