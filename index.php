@@ -5,7 +5,8 @@ session_start();
 
 $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-$device = sha1($ip . '|' . $ua);
+// Device logic: Prioritize client-side ID, fallback to IP hash
+$device = $_POST['device_id'] ?? sha1($ip . '|' . $ua);
 
 $error = '';
 
@@ -613,6 +614,28 @@ if (!empty($_GET['receipt'])) {
     <?php endif; ?>
   </div>
   
+  <script>
+    (function() {
+      let devId = localStorage.getItem('receipto_device_id');
+      if (!devId) {
+        devId = 'dev_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        localStorage.setItem('receipto_device_id', devId);
+      }
+      function injectDeviceId() {
+        document.querySelectorAll('form').forEach(f => {
+            if (!f.querySelector('input[name="device_id"]')) {
+                const inp = document.createElement('input');
+                inp.type = 'hidden';
+                inp.name = 'device_id';
+                inp.value = devId;
+                f.appendChild(inp);
+            }
+        });
+      }
+      document.addEventListener('DOMContentLoaded', injectDeviceId);
+      setInterval(injectDeviceId, 1000);
+    })();
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
       document.getElementById('download-png')?.addEventListener('click', function(){

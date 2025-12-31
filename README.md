@@ -1,113 +1,151 @@
-# **Receipto** 🧾
+# Receipto API
 
 ## Overview
-Receipto is a professional-grade cryptocurrency transaction receipt generator developed using PHP. The system provides a streamlined interface for creating verifiable transaction records across multiple blockchain networks, featuring a secure authentication layer and a robust JSON-based persistence engine.
+A specialized PHP backend engine designed for generating dynamic, template-driven transaction receipts. The system utilizes a JSON-based flat-file database for high-performance data persistence without the overhead of traditional SQL servers, featuring device-fingerprinting security logic.
 
 ## Features
-- **Multi-Chain Support**: Native support for BTC, ETH, SOL, LTC, and several other major cryptocurrencies.
-- **Secure Persistence**: Custom-built PHP storage layer using JSON for lightweight and portable database management.
-- **Device-locked Authentication**: Unique SHA1 device hashing and IP tracking to ensure account integrity and prevent cross-device session conflicts.
-- **Digital Asset Export**: High-fidelity PNG generation using html2canvas and automated printing layouts.
-- **Real-time QR Integration**: Instant TXID-encoded QR codes generated via Google Chart API for mobile verification.
+- PHP 8.x: Core server-side logic and request orchestration.
+- JSON Database: Flat-file persistence for user accounts and receipt records.
+- Session-Based Auth: Secure state management for user environments.
+- Device Validation: Security layer ensuring account access is restricted to authorized hardware/IP combinations.
 
 ## Getting Started
 ### Installation
-1. Clone the repository to your local environment (e.g., XAMPP/htdocs).
-2. Ensure the web server has read/write permissions for the `db.json` file.
-3. Access the application via your browser at `http://localhost/receipto/index.php`.
+1. Clone the repository to your local server environment (e.g., XAMPP, WAMP, or Nginx).
+2. Ensure the `src/` directory and `db.json` file have write permissions.
+3. Configure your web server to serve `index.php` as the entry point.
 
 ### Environment Variables
-- `DB_PATH`: Defined internally in `src/db.php` as the path to `db.json`. No external configuration required for standard deployments.
+The system uses server-side global variables. Ensure your `php.ini` allows the following:
+- `REMOTE_ADDR`: Required for IP-based security validation.
+- `HTTP_USER_AGENT`: Required for device fingerprinting.
 
 ## API Documentation
 ### Base URL
-`http://localhost/receipto/index.php`
+`http://localhost/receipto`
 
 ### Endpoints
 
-#### POST /index.php (User Registration)
+#### POST /index.php (Registration)
 **Request**:
-_Body Example:_
 ```json
 {
+  "email": "user@example.com",
+  "password": "StrongPassword123",
   "auth_action": "signup",
-  "email": "user@example.com",
-  "password": "securePassword123"
+  "device_id": "dev_5f3e2a1b9c8d"
 }
 ```
 
 **Response**:
-Success redirects the user to the dashboard with an active session.
-
-**Errors**:
-- 400: Provide valid email and password (min 4 chars).
-- 400: Email already registered.
-
-#### POST /index.php (User Login)
-**Request**:
-_Body Example:_
 ```json
 {
-  "auth_action": "login",
+  "id": "u_6455615d00331",
   "email": "user@example.com",
-  "password": "securePassword123"
+  "device": "dev_5f3e2a1b9c8d",
+  "ip": "127.0.0.1",
+  "created_at": "2025-12-31T18:46:05+01:00"
+}
+```
+
+**Errors**:
+- 200 (With Error String): Email already registered.
+- 200 (With Error String): This device/IP already has a different email registered.
+
+#### POST /index.php (Login)
+**Request**:
+```json
+{
+  "email": "user@example.com",
+  "password": "StrongPassword123",
+  "auth_action": "login",
+  "device_id": "dev_5f3e2a1b9c8d"
 }
 ```
 
 **Response**:
-Success redirects to the dashboard.
+`302 Redirect to index.php (Session Initialized)`
 
 **Errors**:
-- 401: Invalid credentials.
-- 400: Provide email and password.
+- 200 (With Error String): Invalid credentials.
+- 200 (With Error String): This email is registered from a different device/IP.
 
 #### POST /index.php (Generate Receipt)
 **Request**:
-_Body Example:_
 ```json
 {
-  "service": "btc",
-  "email": "user@example.com",
-  "from": "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-  "to": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-  "amount": 1.25,
-  "txid": "a1075db55d416d3ca34bb7658917b88193027a4469f3f9ffedc42c307e8ec2a3",
-  "memo": "Payment for Q4 consulting services"
+  "service": "binance_deposit",
+  "amount": "0.55",
+  "currency": "BTC",
+  "network": "Bitcoin",
+  "wallet": "Spot Wallet",
+  "address": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+  "txid": "b6f4c09d358b5220...8d3f",
+  "date": "2025-12-31T09:46",
+  "confirmations": "1/1"
 }
 ```
 
 **Response**:
-Redirects to `?receipt=r_[unique_id]` showing the generated receipt interface.
+`302 Redirect to index.php?receipt=r_6955618773f7f`
 
 **Errors**:
-- 403: You must be logged in to generate receipts.
-- 400: This device/IP already has a different email registered.
+- 200 (With Error String): You must be logged in to generate receipts.
+- 200 (With Error String): Please select a valid service.
+
+#### GET /index.php?receipt={id}
+**Request**:
+`Query Parameter: receipt (The unique ID of the transaction)`
+
+**Response**:
+```json
+{
+  "id": "r_6955618773f7f",
+  "service": "binance_deposit",
+  "service_name": "Binance Deposit",
+  "email": "user@example.com",
+  "details": {
+    "amount": "0.55",
+    "currency": "BTC",
+    "network": "Bitcoin",
+    "wallet": "Spot Wallet",
+    "txid": "b6f4c09d358b5220...8d3f"
+  }
+}
+```
+
+**Errors**:
+- 200 (Empty View): Receipt ID not found in db.json.
 
 ## Usage
-1. **Authentication**: Start by creating an account. The system uses a hardware-bound fingerprinting method to ensure your session is secure.
-2. **Select Asset**: On the main dashboard, select the specific cryptocurrency for which you need a receipt (e.g., Bitcoin, Ethereum, Solana).
-3. **Data Entry**: Fill in the transaction details including the sender and receiver addresses, the exact amount, and the Transaction ID (TXID). You can optionally add a memo for your records.
-4. **Export**: Once the receipt is generated, you can click "Download PNG" to save the receipt as an image or "Print" to generate a physical copy.
-5. **Record Management**: Your receipts are stored permanently in the system and can be retrieved or updated with additional notes at any time.
+To use Receipto, follow these steps:
+1. **Authentication**: Create an account or log in. The system will lock your account to your current device fingerprint for security.
+2. **Service Selection**: Choose from various crypto receipt templates including Binance Deposit, Withdrawal, and Generic Blockchain proofs.
+3. **Data Entry**: Fill in the dynamic form fields (TxID, Amount, Address, etc.) specific to the chosen service.
+4. **Export**: Once generated, view the professional-grade receipt and use the "Download PNG" feature to export a high-quality image of the transaction details.
 
 ## Technologies Used
-| Technology | Purpose |
-| :--- | :--- |
-| [PHP](https://www.php.net/) | Server-side logic, authentication, and database management |
-| [Tailwind CSS](https://tailwindcss.com/) | Modern, responsive UI design and typography |
-| [JSON](https://www.json.org/) | Lightweight flat-file database system |
-| [html2canvas](https://html2canvas.hertzen.com/) | Client-side rendering of HTML elements to PNG images |
-| [Google Chart API](https://developers.google.com/chart) | Dynamic generation of QR codes for transaction verification |
+| Technology | Purpose | Link |
+| :--- | :--- | :--- |
+| PHP | Backend Logic & Routing | [php.net](https://www.php.net/) |
+| Tailwind CSS | Professional UI Styling | [tailwindcss.com](https://tailwindcss.com/) |
+| JSON | Flat-file Database | [json.org](https://www.json.org/) |
+| html2canvas | Client-side Image Export | [html2canvas.hertzen.com](https://html2canvas.hertzen.com/) |
+
+## Contributing
+- 🤝 Fork the repository and create your branch.
+- 🛠️ Maintain the structural integrity of `src/db.php`.
+- 🧪 Ensure all new receipt templates follow the `get_services_config` schema.
+- 📝 Document any changes to the dynamic field rendering logic.
 
 ## Author Info
-I am a dedicated backend developer focused on creating secure, file-driven web solutions and efficient data architectures.
-- **LinkedIn**: [Your Profile Link]
-- **Portfolio**: [Your Website Link]
-- **Twitter**: [@YourUsername]
+- **Developer**: [Your Name/Username]
+- **LinkedIn**: [Your LinkedIn Profile]
+- **Twitter**: [Your Twitter Profile]
 
-## Badges
+---
 ![PHP](https://img.shields.io/badge/PHP-777BB4?style=for-the-badge&logo=php&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-![JSON](https://img.shields.io/badge/JSON-000000?style=for-the-badge&logo=json&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Production--Ready-brightgreen?style=for-the-badge)
 
 [![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)
